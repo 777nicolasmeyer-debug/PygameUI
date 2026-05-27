@@ -8,6 +8,10 @@ class Button:
         self.image = pygame.transform.scale(image, (width, height))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.clicked = False
+        self.font = pygame.font.SysFont(None, 32)
+        self.text = ""
+        self.text_color = (255, 255, 255)
+
 
         # Hover effect
         self.hover_image = self.image.copy()
@@ -15,11 +19,16 @@ class Button:
         light.fill((60, 60, 60, 80))
         self.hover_image.blit(light, (0, 0))
 
+    
+    def set_text(self, text):
+        self.text = text
+
+
     def draw(self, window):
         action = False
         mousePos = pygame.mouse.get_pos()
 
-        # Always define default image first
+        # Define default image each loop
         current_image = self.image
 
         if self.rect.collidepoint(mousePos):
@@ -34,5 +43,12 @@ class Button:
             self.clicked = False
 
         window.blit(current_image, self.rect)
+
+        # Display text after drawing the button
+        if self.text != "":
+            text_surface = self.font.render(self.text, True, self.text_color)
+            text_rect = text_surface.get_rect(center=self.rect.center)
+            window.blit(text_surface, text_rect)
+
 
         return action
