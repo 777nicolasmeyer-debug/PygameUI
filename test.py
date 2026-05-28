@@ -1,5 +1,3 @@
-from re import S
-from token import NUMBER
 
 import pygame
 from buttons import Button
