@@ -1,10 +1,10 @@
 import pygame
-from buttons import Button    # In a real project say, from PygameUI import (Button, Text, States ect...)
+from buttons import Button
 from text_input import Text
 from state_handeling import States
-States = States("start")  # Create state manager with default state "start"
 
 pygame.init()
+
 # -------------------------
 # Setup
 # -------------------------
@@ -12,99 +12,78 @@ WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("UI Tutorial Test")
 clock = pygame.time.Clock()
-
 font = pygame.font.SysFont(None, 40)
 
 # -------------------------
-# Create simple colored surfaces (buttons need images)
-# -------------------------                                                                                         
-red_surface = pygame.Surface((150, 80)) # Here you can upload a .png file by saying: red_surface = pygame.image.load("Your_file_here.png").convert_alpha() and so on for the other colors
-red_surface.fill((200, 50, 50))         # If you use a .png file this line is unnecessary
+# Create UI Elements - Buttons
+# -------------------------
+states = States("start")  # Create state manager with default state "start"
 
-orange_surface = pygame.Surface((150, 80))
-orange_surface.fill((255, 140, 0))
-
-blue_surface = pygame.Surface((150, 80))
-blue_surface.fill((50, 100, 255))
+# See buttons.py for how to create buttons wiht .png files
+red_btn = Button.create_colored_button(100, 350, (200, 50, 50), "Red")  # Create red button at x=100, y=350
+orange_btn = Button.create_colored_button(325, 350, (255, 140, 0), "Orange")  # Create orange button at x=325, y=350
+blue_btn = Button.create_colored_button(550, 350, (50, 100, 255), "Blue")  # Create blue button at x=550, y=350
 
 # -------------------------
-# Create Buttons
+# Create UI Elements - Text Inputs
 # -------------------------
-red_button = Button(100, 350, red_surface)
-red_button.set_text("Red")               # I recomend setting the text like this so that you can reuse .png files instead of needing one for each button
-
-orange_button = Button(325, 350, orange_surface)
-orange_button.set_text("Orange")
-
-blue_button = Button(550, 350, blue_surface)
-blue_button.set_text("Blue")
+text_box = Text.create_text_input(300, 150, font, mode="text")  # If set to text, all characters will be accepted
+num_box = Text.create_text_input(300, 250, font, mode="number")  # If set to number, only numbers will be accepted
+prompt_return = Text.create_text_input(300, 150, font)  # Text input for displaying prompts
 
 # -------------------------
-# Create Text Input
+# State to Color Mapping
 # -------------------------
-text_box1 = Text(300, 150, font, (255, 255, 255), "text") # If its set to text, all characters wil be acepted
-prompt_box1 = Text(300, 100, font, (255, 255, 255), "text")
-number_box1 = Text(300, 250, font, (255, 255, 255), "number") # If its set to number only nubers wil be accepted
-prompt_box2 = Text(300, 200, font, (255, 255, 255), "text")
-prompt_box3 = Text(250, 300, font, (255, 255, 255), "text")
-prompt_box4 = Text(300, 150, font, (255, 255, 255), "text")
-
+state_colors = {
+    "start": (30, 30, 30),      # Dark gray background for start screen
+    "red": (200, 50, 50),       # Red background when red state is active
+    "orange": (255, 140, 0),    # Orange background when orange state is active
+    "blue": (50, 100, 255),     # Blue background when blue state is active
+}
 
 # -------------------------
 # Main Loop
 # -------------------------
-BGcolor = (30, 30, 30)
-
 running = True
 while running:
-    screen.fill((BGcolor))
+    screen.fill(state_colors.get(states.current, (30, 30, 30)))
 
-    # ---- EVENT HANDLING ----
+    # ---- Event Handling ----
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-        # pass typing events to text box
-        text_box1.handle_event(event)
-        number_box1.handle_event(event)
+        text_box.handle_event(event)  # Pass keyboard events to text input
+        num_box.handle_event(event)   # Pass keyboard events to number input
 
-    # ---- BUTTONS ----
-    if States.current == "start":
-        if red_button.draw(screen):
-            States.set_state("red")
+        # If not on start screen and Enter is pressed, return to start
+        if states.current != "start" and event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            states.set_state("start")
 
-        if orange_button.draw(screen):
-            States.set_state("orange")
+    # ---- Render Based on State ----
+    if states.current == "start":
+        # Draw buttons and check if they were clicked
+        if red_btn.draw(screen):
+            states.set_state("red")
+        if orange_btn.draw(screen):
+            states.set_state("orange")
+        if blue_btn.draw(screen):
+            states.set_state("blue")
 
-        if blue_button.draw(screen):
-            States.set_state("blue")
+        # Draw prompts
+        Text.create_text_input(300, 100, font).drawPrompt(screen, "Enter your name:")
+        Text.create_text_input(300, 200, font).drawPrompt(screen, "Enter your age:")
+        Text.create_text_input(250, 300, font).drawPrompt(screen, "Select your favorite color:")
 
-    #---- Change background color based on state ----
-    if States.current != "start":
-        if States.current == "red":
-            BGcolor = (200, 50, 50)
-        elif States.current == "orange":
-            BGcolor = (255, 140, 0)
-        elif States.current == "blue":
-            BGcolor = (50, 100, 255)
+        # Draw input boxes
+        text_box.draw(screen)
+        num_box.draw(screen)
+    else:
+        # If in a color state, show return prompt
+        prompt_return.drawPrompt(screen, "Press enter")
 
-        prompt_box4.drawPrompt(screen, "Press enter")
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-            States.set_state("start")
-            BGcolor = (30, 30, 30)
-
-    # ---- DRAW TEXT ----
-    if States.current == "start":
-        prompt_box1.drawPrompt(screen, "Enter your name:")
-        prompt_box2.drawPrompt(screen, "Enter your age:")
-        prompt_box3.drawPrompt(screen, "Select your favorite color:")
-        text_box1.draw(screen)
-        number_box1.draw(screen)
-
-    # ---- UPDATE ----
+    # ---- Update Display ----
     pygame.display.update()
-    clock.tick(60)
+    clock.tick(60)  # Cap framerate at 60 FPS
 
 pygame.quit()
-# -------------------------
-# The lines look nice, but idk if im ever gonna use it again

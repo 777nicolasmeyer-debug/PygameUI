@@ -1,7 +1,8 @@
 import pygame
 from pygame import surface
 
-class Text:                                            # 200 and 40 is just default values
+
+class Text:
     def __init__(self, x, y, font, color, mode="text", width=200, height=40):
         self.x = x
         self.y = y
@@ -54,6 +55,11 @@ class Text:                                            # 200 and 40 is just defa
         surface.blit(text_surface, (self.rect.x + 5, self.rect.y + 5))
 
 
-    def drawPrompt(self, surface,prompt_text):
+    def drawPrompt(self, surface, prompt_text):
         prompt_surface = self.font.render(prompt_text, True, (255, 255, 255))
         surface.blit(prompt_surface, (self.x, self.y))
+
+
+    def create_text_input(x, y, font, color=(255, 255, 255), mode="text", width=200, height=40):
+        # Helper Functions make everythign look nicer so im just gonna roll with it
+        return Text(x, y, font, color, mode, width, height)

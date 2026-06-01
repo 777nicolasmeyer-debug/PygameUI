@@ -1,7 +1,10 @@
 
 import pygame
+
+# For png. files use the regular constructor not the create_coloured_button one
+
 class Button:
-    
+
     def __init__(self, x, y, image, scale=1.0):
         width = int(image.get_width() * scale)
         height = int(image.get_height() * scale)
@@ -12,14 +15,13 @@ class Button:
         self.text = ""
         self.text_color = (255, 255, 255)
 
-
         # Hover effect
         self.hover_image = self.image.copy()
         light = pygame.Surface(self.image.get_size(), pygame.SRCALPHA)
         light.fill((60, 60, 60, 80))
         self.hover_image.blit(light, (0, 0))
 
-    
+
     def set_text(self, text):
         self.text = text
 
@@ -50,5 +52,14 @@ class Button:
             text_rect = text_surface.get_rect(center=self.rect.center)
             window.blit(text_surface, text_rect)
 
-
         return action
+
+
+    def create_colored_button(x, y, color, text, width=150, height=80):
+        # Also returns whetehr it has been clicked or not for les code
+        # Again, a helper function makes my code in test.py more understandable so yeah
+        surface = pygame.Surface((width, height))
+        surface.fill(color)
+        button = Button(x, y, surface)
+        button.set_text(text)
+        return button
