@@ -56,10 +56,11 @@ class Text:
 
 
     def drawPrompt(self, surface, prompt_text):
-        prompt_surface = self.font.render(prompt_text, True, (255, 255, 255))
+        prompt_surface = self.font.render(prompt_text, True, self.color)
         surface.blit(prompt_surface, (self.x, self.y))
 
 
+    @staticmethod
     def create_text_input(x, y, font, color=(255, 255, 255), mode="text", width=200, height=40):
         # Helper Functions make everythign look nicer so im just gonna roll with it
         return Text(x, y, font, color, mode, width, height)

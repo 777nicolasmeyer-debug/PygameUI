@@ -55,6 +55,7 @@ class Button:
         return action
 
 
+    @staticmethod
     def create_colored_button(x, y, color, text, width=150, height=80):
         # Also returns whetehr it has been clicked or not for les code
         # Again, a helper function makes my code in test.py more understandable so yeah
